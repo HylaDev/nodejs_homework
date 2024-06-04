@@ -2,6 +2,7 @@ import express from "express";
 import {addNewUser, getAllUsers} from "../../services/users/index.js";
 import { hashPassword, generateJwt } from "../../services/hashPass/hash.js";
 import isAuthenticated from "../../../middlewares/isAuthenticated/index.js";
+import checkIsAdmin from "../../../middlewares/isAdmin/index.js";
 import {body, validationResult} from 'express-validator';
 
 
@@ -12,7 +13,7 @@ const validationRules = [
   body("password", "The minimum password length is 8 characters").isLength({min: 8})
 ];
 
-router.get('/', (req, res) => {
+router.get('/', isAuthenticated, checkIsAdmin, (req, res) => {
   getAllUsers()
   .then(users => res.status(200).json(users))
   .catch(err => res.status(500).json({ error: err }));
@@ -37,7 +38,7 @@ router.post("/add", validationRules, async (req, res) => {
        email: user.email,
      };
      const userToken = await generateJwt(payload);
-     res.cookie("auth-token", userToken, { httpOnly: true});
+     res.cookie("auth_token", userToken, { httpOnly: true});
      
      // Response after request succefull
      return res.status(201).json({

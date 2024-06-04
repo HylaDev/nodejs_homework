@@ -1,11 +1,11 @@
-function isAuthenticated(req, res, next, token) {
-    // je dois récupérer le token dans le cookie
-    // je dois vérifier si le token est valide
-    // si le token est valide je dois appeler next
-    // si non je renvoie une erreur (res.status(401).json({message: "Unauthorized"})
-  
+function isAuthenticated(req, res, next) {
+
+    /*const token = req.cookies;
+    if (!token) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }*/
     next();
   }
-  
+
   export default isAuthenticated;
   
