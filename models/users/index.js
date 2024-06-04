@@ -5,8 +5,8 @@ const usersSchema = new Schema({
         type: String,
         required: true,
         },
-    fullName: {
-        type: String,
+    isAdmin: {
+        type: Boolean,
         required: true,
     },
     password: {

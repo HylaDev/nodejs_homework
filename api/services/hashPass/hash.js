@@ -2,8 +2,8 @@ import brypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import fs from "fs";
 
+// Read the private key
 const privateKey = fs.readFileSync("private.key");
-const publicKey = fs.readFileSync("public.key");
 
 function hashPassword(password) {
   return new Promise((resolve, reject) => {
