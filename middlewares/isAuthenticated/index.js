@@ -1,9 +1,10 @@
 function isAuthenticated(req, res, next) {
-
-    /*const token = req.cookies;
+    // Get token from cookie
+    const token = req.headers.cookie;
     if (!token) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }*/
+      return res.status(401).json({ message: 'Unauthorized, token not found' });
+    }
+    
     next();
   }
 

@@ -3,6 +3,7 @@ import { connect } from 'mongoose';
 import usersRoute from './api/routes/users/routes.js'
 import variationsRoute from './api/routes/variations/routes.js'
 import path from 'path';
+import cookieParser from 'cookie-parser';
 
 (
   async () => 
@@ -12,6 +13,7 @@ import path from 'path';
 
       // Middlewares
       app.use(express.json());
+      app.use(cookieParser());
 
       // Routes
       app.get("/", (req, res) => {

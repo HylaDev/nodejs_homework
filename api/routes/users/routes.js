@@ -19,6 +19,7 @@ router.get('/', isAuthenticated, checkIsAdmin, (req, res) => {
   .catch(err => res.status(500).json({ error: err }));
 });
 
+// Add new user
 router.post("/add", validationRules, async (req, res) => {
   // Data validations
   const errors = validationResult(req);
@@ -36,11 +37,12 @@ router.post("/add", validationRules, async (req, res) => {
      const payload = {
        _id: user._id,
        email: user.email,
+       isAdmin: user.isAdmin,
      };
      const userToken = await generateJwt(payload);
      res.cookie("auth_token", userToken, { httpOnly: true});
      
-     // Response after request succefull
+     // Response after request successful
      return res.status(201).json({
        message: "User created",
        user: {
@@ -52,6 +54,8 @@ router.post("/add", validationRules, async (req, res) => {
    } catch (error) {
      return res.status(500).json({ message: "An error occurred" });
    }
- });
+ }); 
+
+ // Logout user
 
 export default router;
