@@ -1,4 +1,4 @@
-import brypt from "bcrypt";
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import fs from "fs";
 
@@ -7,11 +7,11 @@ const privateKey = fs.readFileSync("private.key");
 
 function hashPassword(password) {
   return new Promise((resolve, reject) => {
-    brypt.genSalt(10, (error, salt) => {
+    bcrypt.genSalt(10, (error, salt) => {
       if (error) {
         reject(error);
       } else {
-        brypt.hash(password, salt, (error, hash) => {
+        bcrypt.hash(password, salt, (error, hash) => {
           if (error) {
             reject(error);
           } else {

@@ -29,4 +29,5 @@
           .catch(err => reject(err));
     });
   }
+  
   export { addNewUser, getAllUsers};

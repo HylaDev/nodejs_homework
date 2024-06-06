@@ -12,8 +12,8 @@ function checkIsAdmin(req, res, next) {
     const token = req.headers.cookie;
     const tokenNameRemoved = token.split("auth_token=")[1];
     // Debug the token
-    console.log('token before name removed',token)
-    console.log('token atfer name removed:',tokenNameRemoved)
+    //console.log('token before name removed',token)
+    //console.log('token atfer name removed:',tokenNameRemoved)
     if (!token) {
         return res.status(401).json({ error: 'Unauthorized, token not found' });
     }
@@ -32,7 +32,7 @@ function checkIsAdmin(req, res, next) {
         next();
     } catch (err) {
         // Debug error
-        console.log(err);
+        //console.log(err);
         return res.status(403).json({
             message: "Token is not valid" 
         });
