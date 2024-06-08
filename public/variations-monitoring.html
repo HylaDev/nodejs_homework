@@ -26,12 +26,11 @@
         console.log('Connecté au serveur Socket.IO');
       });
 
-      socket.on('message', (msg) => {
-        console.log('Message du serveur : ' + msg);
+      socket.on('data', (data) => {
         const messagesDiv = document.getElementById('messages');
         const messageParagraph = document.createElement('p');
         messageParagraph.className = 'message';
-        messageParagraph.textContent = msg;
+        messageParagraph.textContent = ${data.temperature};
         messagesDiv.appendChild(messageParagraph);
       });
 

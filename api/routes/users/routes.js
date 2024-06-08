@@ -9,12 +9,15 @@ import bcrypt  from 'bcrypt';
 
 
 const router = express.Router();
+
+// Data validations rules
 const validationRules = [
   body("email", "Email must be valid and not empty").notEmpty().isEmail(),
   body("isAdmin", "Must be boolean value and not empty").notEmpty().isBoolean(),
   body("password", "The minimum password length is 8 characters").isLength({min: 8})
 ];
 
+// Get all users
 router.get('/', isAuthenticated, checkIsAdmin, (req, res) => {
   getAllUsers()
   .then(users => res.status(200).json(users))
@@ -66,24 +69,24 @@ router.post("/add", validationRules, async (req, res) => {
  }); 
 
  // Login user
- router.get("/login", async(req, res) => {
+ router.post("/login", async(req, res) => {
     const {email, password} = req.body;
 
     try { 
       // Check if user provide the right credentials
       const user = await userModel.findOne({email});
-
       if (!user) {
-        res.status(400).json({ message: "User email not found" });
+        return res.status(400).json({ message: "User email not found" });
       }
+      
       const userPassWord = await bcrypt.compare(password, user.password);
-
       if (!userPassWord) {
         return res.status(400).json({ message: "Invalid password" });
       }
       // Token generation and saved in cookie
       const payload = {
         _id: user._id,
+        isAdmin: user.isAdmin
       };
       const userToken = await generateJwt(payload);
       res.cookie("auth_token", userToken, { httpOnly: true});
@@ -93,6 +96,19 @@ router.post("/add", validationRules, async (req, res) => {
       console.log(error);
       return res.status(500).json({ message: "An error occurred" });
     }
+ });
+
+ // Logout user
+ router.get('/logout', async(req, res) => {
+
+  // Get token from cookie
+    const userSession = req.headers.cookie;
+    if (!userSession) {
+      return res.status(404).json({message: "Token not found"});
+    }
+    res.clearCookie(userSession);
+    res.status(200).json({message:  "User logout successfully"});
+    
  });
 
 export default router;
