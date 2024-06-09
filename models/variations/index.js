@@ -1,16 +1,16 @@
 import { Schema, model } from "mongoose";
 
 const variationsSchema = new Schema({
-    temperature: {
-        type: Int,
+    type: {
+        type: String,
         required: true,
         },
-    humidity: {
-        type: Int,
+    value: {
+        type: Number,
         required: true,
     }
 });
 
-const Variation = model("Variation", usersSchema);
+const Variation = model("Variation", variationsSchema);
 
 export default Variation;

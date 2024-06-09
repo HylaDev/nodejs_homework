@@ -1,6 +1,7 @@
 import express from "express";
 import {addNewUser, getAllUsers} from "../../services/users/index.js";
-import { hashPassword, generateJwt } from "../../services/hashPass/hash.js";
+import hashPassword from "../../services/hashPass/hash.js";
+import generateJwt from "../../services/genJWT/gen.js";
 import isAuthenticated from "../../../middlewares/isAuthenticated/index.js";
 import checkIsAdmin from "../../../middlewares/isAdmin/index.js";
 import {body, validationResult} from 'express-validator';
@@ -12,9 +13,9 @@ const router = express.Router();
 
 // Data validations rules
 const validationRules = [
-  body("email", "Email must be valid and not empty").notEmpty().isEmail(),
+  body("email", "Email must be valid and not empty").notEmpty().isEmail().normalizeEmail(),
   body("isAdmin", "Must be boolean value and not empty").notEmpty().isBoolean(),
-  body("password", "The minimum password length is 8 characters").isLength({min: 8})
+  body("password", "The minimum password length is 8 characters").notEmpty().escape().isLength({min: 8})
 ];
 
 // Get all users
@@ -99,7 +100,7 @@ router.post("/add", validationRules, async (req, res) => {
  });
 
  // Logout user
- router.get('/logout', async(req, res) => {
+ router.get('/logout', isAuthenticated, async(req, res) => {
 
   // Get token from cookie
     const userSession = req.headers.cookie;

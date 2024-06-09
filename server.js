@@ -8,6 +8,7 @@ import cookieParser from 'cookie-parser';
 import { Server } from 'socket.io';
 import csurf from 'csurf';
 import SensorSimulator from './api/services/variations/SensorSimulator.js';
+import {saveAlert} from './api/services/variations/index.js';
 
 (
   async () => 
@@ -24,52 +25,58 @@ import SensorSimulator from './api/services/variations/SensorSimulator.js';
       app.use(cookieParser());
       app.use(csrfProtection);
 
-      app.get('/csrf-token', csrfProtection, (req, res) => {
+      // Route to get csrf token for requests
+      app.get('/csrf-token-random', csrfProtection, (req, res) => {
         res.json({ csrfToken: req.csrfToken() });
       });
       app.use((err, req, res, next) => {
         if (err.code === 'EBADCSRFTOKEN') {
-          res.status(403).send('Formulaire non valide');
+          res.status(403).send('CSRF token is invalid');
         } else {
           next(err);
         }
       });
-      // Users routes
+      // Welcome route
       app.get("/", (req, res) => {
         res.send({ message: "Welcome to monitoring web app" });
       });
+      // Users routes
       app.use("/users", csrfProtection, usersRoute);
 
       // Variations routes
-      app.use("/variations", variationsRoute)
-      const __filename = fileURLToPath(import.meta.url);
-      const __dirname = path.dirname(__filename);
-      app.get("/variation-monitoring", (req, res) => {
-        res.sendFile(path.join(__dirname, "public", "variations-monitoring.html"));
-      });
+      app.use("/variations", csrfProtection, variationsRoute)
+
 
       // Initialize server
       const port = 3000;
       const server = app.listen(port, () => console.log(`listening on port ${port}`));
 
       const io = new Server(server);
-      
-      io.on("connection", (sensorSimulator) => {
-        console.log("Un utilisateur s'est connecté");
-      
-        sensorSimulator.on('data', (data) => {
-          io.emit('data', data);
-          
-        })
-      
-        setInterval(() => {
-          sensorSimulator.emit("message", "Message automatique");
-        }, 5000);
-      
-        socket.on("disconnect", () => {
-          console.log("Un utilisateur s'est déconnecté");
+
+      const sensorSimulator = new SensorSimulator();
+
+      sensorSimulator.on('data', (data) => {
+        console.log('Real time data:', data);
+        io.emit('sensorData', data);
+      });
+
+      sensorSimulator.on('alert', (alert) => {
+        console.log('Alerts:', alert);
+        if (alert) {
+          saveAlert(alert.type, alert.value);
+        }
+        io.emit('sensorAlert', alert);
+      });
+
+      io.on('connection', (socket) => {
+        console.log('Connected');
+
+        socket.on('disconnect', () => {
+          console.log('Disconnected');
         });
       });
+
+      sensorSimulator.start();
 
       // connect to database
       connect("mongodb://localhost:27017/yelian")
